@@ -48,6 +48,13 @@ namespace UrunSatinAlma.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetAllCategories")]
+        public IActionResult GetAllCategories()
+        {
+            var result = _urunSatisService.GetAllCategories();
+            return Ok(result);
+        }
+
         [HttpGet("GetProductById")]
         public IActionResult GetProductById([FromQuery] long id)
         {

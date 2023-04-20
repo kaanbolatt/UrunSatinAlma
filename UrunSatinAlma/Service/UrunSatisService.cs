@@ -102,17 +102,17 @@ namespace UrunSatinAlma.Service
 
             }
         }
-        public bool Login(LoginRequestDto model)
+        public User? Login(LoginRequestDto model)
         {
             var userRepo = urunSatisContext.Users.ToList();
-            var userCheck = userRepo.Where(x => x.Email == model.Email && x.Password == model.Password).Any();
-            if (userCheck)
+            var userCheck = userRepo.Where(x => x.Email == model.Email && x.Password == model.Password).FirstOrDefault();
+            if (userCheck != null)
             {
-                return true;
+                return userCheck;
             }
             else
             {
-                return false;
+                return null;
 
             }
         }
@@ -124,7 +124,7 @@ namespace UrunSatinAlma.Service
                 var prodCheck = urunSatisContext.Products.Where(x => x.Name.ToLower().Contains(lowerCase) && x.CategoryId == model.CategoryId).ToList();
                 return prodCheck;
             }
-            else if (!String.IsNullOrEmpty(model.GeneralSearch) && model.CategoryId == 0)
+            else if (!String.IsNullOrEmpty(model.GeneralSearch) && (model.CategoryId == 0 || model.CategoryId == null))
             {
                 var lowerCase = model.GeneralSearch.ToLower();
                 var prodCheck = urunSatisContext.Products.Where(x => x.Name.ToLower().Contains(lowerCase)).ToList();
@@ -139,6 +139,11 @@ namespace UrunSatinAlma.Service
             {
                 return urunSatisContext.Products.ToList();
             }
+        }
+
+        public List<Category> GetAllCategories()
+        {
+            return urunSatisContext.Categories.ToList();
         }
         public Products? GetProductById(long id)
         {
