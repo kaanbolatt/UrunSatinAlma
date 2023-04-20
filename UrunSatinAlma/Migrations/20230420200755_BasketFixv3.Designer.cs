@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UrunSatinAlma.Context;
 
@@ -11,9 +12,10 @@ using UrunSatinAlma.Context;
 namespace UrunSatinAlma.Migrations
 {
     [DbContext(typeof(UrunSatisContext))]
-    partial class UrunSatisContextModelSnapshot : ModelSnapshot
+    [Migration("20230420200755_BasketFixv3")]
+    partial class BasketFixv3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

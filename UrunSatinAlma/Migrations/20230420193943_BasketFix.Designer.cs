@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UrunSatinAlma.Context;
 
@@ -11,9 +12,10 @@ using UrunSatinAlma.Context;
 namespace UrunSatinAlma.Migrations
 {
     [DbContext(typeof(UrunSatisContext))]
-    partial class UrunSatisContextModelSnapshot : ModelSnapshot
+    [Migration("20230420193943_BasketFix")]
+    partial class BasketFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,18 +32,13 @@ namespace UrunSatinAlma.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ProductsId")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductsId");
 
                     b.HasIndex("UserId");
 
@@ -76,6 +73,9 @@ namespace UrunSatinAlma.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
+                    b.Property<long?>("BasketId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
 
@@ -99,6 +99,8 @@ namespace UrunSatinAlma.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BasketId");
 
                     b.HasIndex("CategoryId");
 
@@ -150,23 +152,21 @@ namespace UrunSatinAlma.Migrations
 
             modelBuilder.Entity("UrunSatinAlma.Context.Basket", b =>
                 {
-                    b.HasOne("UrunSatinAlma.Context.Products", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductsId");
-
                     b.HasOne("UrunSatinAlma.Context.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Products");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("UrunSatinAlma.Context.Products", b =>
                 {
+                    b.HasOne("UrunSatinAlma.Context.Basket", null)
+                        .WithMany("Products")
+                        .HasForeignKey("BasketId");
+
                     b.HasOne("UrunSatinAlma.Context.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
@@ -185,6 +185,11 @@ namespace UrunSatinAlma.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("UrunSatinAlma.Context.Basket", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,7 +8,7 @@ using UrunSatinAlma.Service;
 namespace UrunSatinAlma.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UrunSatisController : ControllerBase
     {
         UrunSatisService _urunSatisService = new UrunSatisService();
@@ -47,6 +47,13 @@ namespace UrunSatinAlma.Controllers
             var result = _urunSatisService.GetAllProducts(model);
             return Ok(result);
         }
+        
+        [HttpGet("GetBasketList")]
+        public IActionResult GetBasketList([FromQuery] long userId)
+        {
+            var result = _urunSatisService.GetBasketList(userId);
+            return Ok(result);
+        }
 
         [HttpGet("GetAllCategories")]
         public IActionResult GetAllCategories()
@@ -69,10 +76,31 @@ namespace UrunSatinAlma.Controllers
             return Ok(result);
         }
 
-        [HttpPost("ProductDelete")]
+        [HttpDelete("ProductDelete")]
         public IActionResult ProductDelete([FromQuery] long id)
         {
             var result = _urunSatisService.ProductDelete(id);
+            return Ok(result);
+        }
+
+        [HttpDelete("CategoryDelete")]
+        public IActionResult CategoryDelete([FromQuery] long id)
+        {
+            var result = _urunSatisService.CategoryDelete(id);
+            return Ok(result);
+        }
+
+        [HttpDelete("BasketProductDelete")]
+        public IActionResult BasketProductDelete([FromQuery] long id)
+        {
+            var result = _urunSatisService.BasketProductDelete(id);
+            return Ok(result);
+        }
+
+        [HttpDelete("AllBasketProductDelete")]
+        public IActionResult AllBasketProductDelete([FromQuery] long userId)
+        {
+            var result = _urunSatisService.AllBasketProductDelete(userId);
             return Ok(result);
         }
 

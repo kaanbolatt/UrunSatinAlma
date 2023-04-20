@@ -1,5 +1,6 @@
 ﻿using UrunSatinAlma.Context;
 using UrunSatinAlma.Dtos;
+using UrunSatinAlma.Migrations;
 
 namespace UrunSatinAlma.Service
 {
@@ -61,24 +62,52 @@ namespace UrunSatinAlma.Service
         }
         public string BasketAdd(BasketRequestDto model)
         {
-            var basket = new Basket();
-            var product = new Products();
-            decimal totalPrice = 0;
-            foreach (var item in model.Products)
+            var eklenenUrun = urunSatisContext.Products.Where(x => x.Id == model.ProductId).FirstOrDefault();
+
+            if (eklenenUrun == null)
             {
-                product.Detail = item.Detail;
-                product.Price = item.Price;
-                product.CategoryId = item.CategoryId;
-                product.Image = item.Image;
-                product.ShortDescription = item.ShortDescription;
-                product.Id = item.Id;
-                basket.Products.Add(product);
-                totalPrice += item.Price;
+                return "Böyle bir ürün satışta yok.";
             }
-            basket.TotalPrice = totalPrice;
+
+            var basket = new Basket();
+            basket.UserId = model.UserId;
+            basket.ProductId = eklenenUrun.Id;
             urunSatisContext.Add(basket);
             urunSatisContext.SaveChanges();
-            return "Ürün Sepetinize Eklendi";
+            return "Ürün sepetinize eklendi.";
+        }
+        public List<BasketResponseDto> GetBasketList(long userId)
+        {
+            var basketRepo = urunSatisContext.Baskets.Where(x => x.UserId == userId).ToList();
+            var productRepo = urunSatisContext.Products.ToList();
+            var query = (from basket in basketRepo
+                         join product in productRepo on basket.ProductId equals product.Id
+                         select new BasketResponseDto { ProductName = product.Name, ProductPrice = product.Price, ProductImage = product.Image, BasketId = basket.Id }).ToList();
+
+            return query;
+        }
+        public string BasketProductDelete(long id)
+        {
+            var deletedBasketItem = urunSatisContext.Baskets.Where(x => x.Id == id).FirstOrDefault();
+            if (deletedBasketItem != null)
+            {
+                urunSatisContext.Remove(deletedBasketItem);
+                urunSatisContext.SaveChanges();
+                return "Ürün sepetinizden kaldırıldı.";
+            }
+            return "Sepet bulunamadı.";
+        }
+
+        public string AllBasketProductDelete(long userId)
+        {
+            var deletedBasketItem = urunSatisContext.Baskets.Where(x => x.UserId == userId).ToList();
+            foreach (var basket in deletedBasketItem)
+            {
+                urunSatisContext.Remove(basket);
+                urunSatisContext.SaveChanges();
+            }
+          
+            return "Sepetinizdeki tüm ürünler kaldırıldı.";
         }
         public string Register(UserRequestDto model)
         {
@@ -86,16 +115,14 @@ namespace UrunSatinAlma.Service
             var userCheck = userRepo.Where(x => x.Email == model.Email).FirstOrDefault();
             if (userCheck != null)
             {
-                return "Bu mail adresi daha önce kullanılıyor";
+                return "Bu mail adresi daha önce kullanılmış";
             }
             else
             {
                 var user = new User();
                 user.Password = model.Password;
                 user.Email = model.Email;
-                user.Name = model.Name;
-                user.Surname = model.Surname;
-                user.RoleId = model.RoleId;
+                user.RoleId = 1;
                 urunSatisContext.Add(user);
                 urunSatisContext.SaveChanges();
                 return "Kullanıcı başarıyla oluşturuldu.";
@@ -164,6 +191,18 @@ namespace UrunSatinAlma.Service
                 return "Ürün başarıyla silindi.";
             }
             return "Ürün bulunamadı.";
+        }
+
+        public string CategoryDelete(long id)
+        {
+            var deletedCategory = urunSatisContext.Categories.Where(x => x.Id == id).FirstOrDefault();
+            if (deletedCategory != null)
+            {
+                urunSatisContext.Remove(deletedCategory);
+                urunSatisContext.SaveChanges();
+                return "Kategori başarıyla silindi.";
+            }
+            return "Kategori bulunamadı.";
         }
     }
 }
